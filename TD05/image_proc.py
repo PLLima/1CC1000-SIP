@@ -17,6 +17,13 @@ def grayscale(img):
             img[:,:,1] * 0.59 + \
             img[:,:,2] * 0.11).astype(int)
 
-img_gray = grayscale(img)
-plt.imshow(img_gray, cmap="gray")
+gray_img = grayscale(img)
+plt.imshow(gray_img, cmap="gray")
 plt.show()
+
+def histogram(gray_img):
+    hist = np.zeros(256)
+    np.add.at(hist, gray_img, 1)
+    return hist / np.sum(hist)
+
+print(histogram(gray_img))
