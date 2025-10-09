@@ -57,23 +57,55 @@ corrected_gray_img = auto_contrast(gray_img)
 plot_intensity(gray_img)
 plot_intensity(corrected_gray_img)
 
-# def plot_color_intensities(img):
-#     bins_r = histogram(img[:,:,0])
-#     bins_g = histogram(img[:,:,1])
-#     bins_b = histogram(img[:,:,2])
-#     x = np.linspace(0, 255, 256)
+def plot_color_intensities(img):
+    bins_r = histogram(img[:,:,0])
+    bins_g = histogram(img[:,:,1])
+    bins_b = histogram(img[:,:,2])
+    x = np.linspace(0, 255, 256)
  
-#     plt.subplots(figsize=(15, 5))
-#     plt.subplot(1, 2, 1)
-#     plt.title("Image")
-#     plt.imshow(img, norm=None)
-#     plt.xticks([]), plt.yticks([])
- 
-#     plt.subplot(1, 2, 2)
-#     plt.title("Intensities")
-#     plt.fill_between(x, bins_r, color="#FF000055")
-#     plt.fill_between(x, bins_g, color="#00FF0055")
-#     plt.fill_between(x, bins_b, color="#0000FF55")
-#     plt.show()
+    fig, (img_plt, hist_plt) = plt.subplots(1, 2, figsize=(15, 5))
+    img_plt.set_title("Image")
+    img_plt.imshow(img, norm=None)
 
-# plot_color_intensities(img)
+    hist_plt.plot(x, bins_r)
+    hist_plt.plot(x, bins_g)
+    hist_plt.plot(x, bins_b)
+    hist_plt.fill_between(x, bins_r, color="#FF000055")
+    hist_plt.fill_between(x, bins_g, color="#00FF0055")
+    hist_plt.fill_between(x, bins_b, color="#0000FF55")
+    hist_plt.set_xlabel("Intensity")
+    hist_plt.set_ylabel("Percentage")
+    hist_plt.set_title("Image Histogram")
+    plt.show(block=True)
+
+def to_YCbCr(img):
+    v = np.array([0, 128, 128])
+    rgb2ycbcr = np.array([[0.299, 0.587, 0.114], [-0.168736, -0.331264, 0.5], [0.5, -0.418688, -0.081312]])
+    tmp = np.dot(img, rgb2ycbcr.T)+v
+    tmp = tmp.astype(int)
+    return np.clip(tmp, 0, 255)
+ 
+def to_RGB(img):
+    v = np.array([0, 128, 128])
+    ycbcr2rgb = np.array([[1, 0, 1.402], [1, -0.344136, -0.714136], [1, 1.772, 0]])
+    tmp = img-v
+    tmp = np.dot(tmp, ycbcr2rgb.T)
+    tmp = tmp.astype(int)
+    return np.clip(tmp, 0, 255)
+ 
+ 
+def test_convertion(img):
+    ycc = to_YCbCr(img)
+    rgb = to_RGB(ycc)
+    diff = np.absolute(img - rgb)
+    print("Min, Max and Mean, of differences between original image and convert-reconvert image : {}, {}, {}".format(
+                np.min(diff), np.max(diff), np.mean(diff)))  
+
+def auto_contrast_YCbCr(img):
+    ycbcr = to_YCbCr(img)
+    ycbcr[:,:,0] = auto_contrast(ycbcr[:,:,0])
+    return to_RGB(ycbcr)
+ 
+corrected_img = auto_contrast_YCbCr(img)
+plot_color_intensities(img)
+plot_color_intensities(corrected_img)
