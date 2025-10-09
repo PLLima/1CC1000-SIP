@@ -53,4 +53,8 @@ def find_corrections(gray_img):
 def auto_contrast(gray_img):
     img = np.zeros_like(gray_img)
     contrast_correction, intensity_contrast = find_corrections(gray_img)
+    corrected_img = contrast_correction * gray_img[:, :] + np.full_like(gray_img, intensity_contrast)
+    return np.clip(corrected_img[:,:], 0, 255)
 
+plot_intensity(gray_img)
+plot_intensity(auto_contrast(gray_img))
