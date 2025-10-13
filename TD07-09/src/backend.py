@@ -7,3 +7,6 @@ cursor = connexion.cursor()
 #                      SELECT *
 #                      FROM students
 #                      '''))
+
+cursor.close()
+connexion.close()
